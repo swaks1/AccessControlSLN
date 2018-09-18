@@ -1,0 +1,105 @@
+﻿@using AccessControlApp.Models.Entities
+@model AccessControlApp.Models.Entities.Person
+
+@{
+    ViewBag.Title = "Details";
+}
+
+@{ 
+    var allReistrations = new List<Registration>();
+    var PointOfAccesses = new List<PointOfAccess>();
+
+    foreach(var device in Model.Devices)
+    {
+        allReistrations.AddRange(device.Registrations);
+    }
+
+    foreach(var registration in allReistrations)
+    {
+        if (!PointOfAccesses.Contains(registration.PointOfAccess))
+        {
+            PointOfAccesses.Add(registration.PointOfAccess);
+        }
+    }
+
+    var returnUrl = @HttpContext.Current.Request.Url.AbsolutePath;
+}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h2>Person Details</h2>
+    </div>
+
+    <div class="col-md-12" style="margin-bottom:10px;">
+        <h3>Personal Info</h3>
+        <div class="well">
+            @Html.DisplayNameFor(model => model.FirstName)      <strong>@Model.FirstName</strong><br />
+            @Html.DisplayNameFor(model => model.LastName)       <strong>@Model.LastName</strong><br />
+            @Html.DisplayNameFor(model => model.DateOfBirth)    <strong>@Model.DateOfBirth</strong><br />
+            @Html.DisplayNameFor(model => model.EnrollmentDate) <strong>@Model.EnrollmentDate</strong><br />
+        </div>
+    </div>
+
+    <div class="col-md-12" style="margin-bottom:30px;">
+        <h3>Device Info<br /></h3>
+
+        @foreach (var device in Model.Devices)
+        {
+            <div class="col-md-4 alert alert-warning" style="margin-right:10px;">
+                <div class="col-md-8">
+                    @device.Type - @device.Code
+                </div>
+                <div class="col-md-4">
+                    <a href="~/Devices/Delete/@device.ID?ReturnUrl=@returnUrl"><i class="fa fa-trash"></i></a> &nbsp;
+                    <a href="~/Devices/Edit/@device.ID?ReturnUrl=@returnUrl"><i class="fa fa-edit"></i></a>
+                </div>
+            </div>
+        }
+
+        <div class="col-md-12" style="margin-bottom:10px;">
+            <a href="~/Devices/Create?ReturnUrl=@returnUrl" class="">Add new <i class="fa fa-plus"></i></a>
+        </div>
+    </div>
+
+    <div class="col-md-12" style="margin-bottom:30px;">
+        <h3>Point Of Access Info</h3>
+
+        @foreach (var poi in PointOfAccesses)
+        {
+            <div class="col-md-5 alert alert-success" style="margin-right:10px">
+                <div class="col-md-12 text-center">
+                    <strong>@poi.Name - @poi.Location</strong>
+                </div>
+                <div class="col-md-12">
+                    <hr />
+                    <h4>Access With</h4>
+                    @foreach (var registration in poi.RegisteredDevices.Where(item => item.Device.PersonID == Model.ID))
+                    {
+                        <div class="col-md-6 well">
+                            <div class="col-md-12">
+                                <strong>@registration.Device.Type - @registration.Device.Code</strong>  <br />
+                                <a href="~/Registrations/Delete/@registration.ID?ReturnUrl=@returnUrl" class=""><i class="fa fa-trash"></i></a> <br />
+
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-12" style="margin-bottom:10px;">
+                        <a href="~/Registrations/AddAccess?ReturnUrl=@returnUrl&PersonId=@Model.ID&PoiID=@poi.ID">
+                            Add Access
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="col-md-12" style="margin-bottom:10px;">
+            <a href="~/Registrations/Create?ReturnUrl=@returnUrl&PersonId=@Model.ID">Register Point of Access <i class="fa fa-plus"></i></a>
+        </div>
+    </div>
+
+</div>
+<hr />
+<div class="col-md-12" style="margin-top:30px;">
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</div>
