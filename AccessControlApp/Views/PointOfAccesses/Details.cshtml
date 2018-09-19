@@ -1,42 +1,125 @@
-﻿@model AccessControlApp.Models.Entities.PointOfAccess
+﻿@using AccessControlApp.Models.Entities
+@model AccessControlApp.Models.Entities.PointOfAccess
 
 @{
     ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+@{
+    var AllRegistrations = Model.RegisteredDevices;
+    var People = new List<Person>();
 
-<div>
-    <h4>PointOfAccess</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
+    foreach(var registration in AllRegistrations)
+    {
+        if (!People.Contains(registration.Device.Person))
+        {
+            People.Add(registration.Device.Person);
+        }
+    }
 
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Location)
-        </dt>
+    var returnUrl = @HttpContext.Current.Request.Url.AbsolutePath;
+}
 
-        <dd>
-            @Html.DisplayFor(model => model.Location)
-        </dd>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h2>Point of Interest Details</h2>
+    </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.DateCreated)
-        </dt>
+    <div class="col-md-12" style="margin-bottom:10px;">
+        <h3>Point of Access Info</h3>
+        <div class="well">
+            @Html.DisplayNameFor(model => model.Name)      <strong style="font-size:1.5em;">@Model.Name</strong><br />
+            @Html.DisplayNameFor(model => model.Location)       <strong>@Model.Location</strong><br />
+            @Html.DisplayNameFor(model => model.DateCreated)    <strong>@Model.DateCreated</strong><br />
+        </div>
+    </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.DateCreated)
-        </dd>
+    <div class="col-md-12" style="margin-bottom:30px;">
+        <h4>People with Access</h4>
 
-    </dl>
+        @foreach (var person in People)
+        {
+            <div class="col-md-5 alert alert-warning" style="margin-right:10px">
+                <div class="col-md-12 text-center">
+                    <h3>@person.FirstName - @person.LastName</h3>
+                </div>
+                <div class="col-md-12">
+                    <hr />
+                    <h4>Access With</h4>
+                    @foreach (var registration in AllRegistrations.Where(item => item.Device.PersonID == person.ID))
+                    {
+                        <div class="col-md-6 well">
+                            <div class="col-md-12">
+                                <strong>@registration.Device.Type - @registration.Device.Code</strong>  <br />
+                                <a href="~/Registrations/Delete/@registration.ID?ReturnUrl=@returnUrl" class=""><i class="fa fa-trash"></i></a> <br />
+
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-12" style="margin-bottom:10px;">
+                        <a href="~/Registrations/AddAccessWithNewDevice?ReturnUrl=@returnUrl&PersonId=@person.ID&PoiID=@Model.ID">
+                            Add Access
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="col-md-12" style="margin-bottom:10px;">
+            <a href="~/Registrations/AddAccessPerson?ReturnUrl=@returnUrl&PoiID=@Model.ID">Add Access to other person <i class="fa fa-plus"></i></a>
+        </div>
+
+    </div>
+
+
+    <div class="col-md-12" style="margin-bottom:30px;">
+        <h3>Entry Logs</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Person</th>
+                    <th>Device</th>
+                    <th>Success</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.EntryLogs.OrderByDescending(item => item.DateCreated))
+                {
+                <tr>
+                    <td>@log.DateCreated</td>
+                    <td>@log.Device.Person.FirstNameLastName</td>
+                    <td>@log.Device.TypeCode</td>
+                    @if (log.Success == true)
+                    {
+                        <td style="background-color:lightgreen">@log.Success</td>
+                    }
+                    else
+                    {
+                        <td style="background-color:lightcoral">@log.Success</td>
+                    }
+                    <td></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+
 </div>
+
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
+
+@section Scripts{
+    <script>        
+        $(function () {
+            console.log("OK");
+        });
+    </script>
+    }

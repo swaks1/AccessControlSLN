@@ -58,8 +58,8 @@ namespace AccessControlApp.Migrations
 
             var logs = new List<EntryLog>
             {
-            new EntryLog{PointOfAccessID = 1, DeviceID = 2,DateCreated = DateTime.Now.AddDays(1),Success = true},
-            new EntryLog{PointOfAccessID = 2, DeviceID = 1,DateCreated = DateTime.Now.AddDays(2),Success = false},
+            new EntryLog{PointOfAccessID = 1, DeviceID = 2,DateCreated = DateTime.Now.AddDays(-1),Success = true},
+            new EntryLog{PointOfAccessID = 2, DeviceID = 1,DateCreated = DateTime.Now.AddDays(-2),Success = false},
             };
             logs.ForEach(s => context.EntryLogs.Add(s));
             context.SaveChanges();

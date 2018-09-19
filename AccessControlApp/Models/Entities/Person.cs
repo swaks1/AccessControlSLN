@@ -12,7 +12,7 @@ namespace AccessControlApp.Models.Entities
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public DateTime EnrollmentDate { get; set; }
-
+        public string FirstNameLastName { get { return FirstName + " " + LastName; } }
         //Navigational Properties
         public virtual ICollection<Device> Devices { get; set; }
     }

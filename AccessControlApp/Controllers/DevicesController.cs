@@ -15,14 +15,12 @@ namespace AccessControlApp.Controllers
     {
         private AccessControlContext db = new AccessControlContext();
 
-        // GET: Devices
         public ActionResult Index()
         {
             var devices = db.Devices.Include(d => d.Person);
             return View(devices.ToList());
         }
 
-        // GET: Devices/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -37,19 +35,24 @@ namespace AccessControlApp.Controllers
             return View(device);
         }
 
-        // GET: Devices/Create
-        public ActionResult Create()
+        public ActionResult Create(int? PersonId)
         {
-            ViewBag.PersonID = new SelectList(db.Persons, "ID", "FirstName");
+            if (PersonId == null)
+            {
+                ViewBag.PersonID = new SelectList(db.Persons, "ID", "FirstNameLastName");
+            }
+            else
+            {
+                ViewBag.PersonID = new SelectList(db.Persons.Where(item => item.ID == PersonId), "ID", "FirstNameLastName");
+            }
+
             return View();
         }
 
-        // POST: Devices/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Type,Code,DateCreated,PersonID")] Device device, string ReturnUrl)
+        public ActionResult Create([Bind(Include = "ID,Type,Code,DateCreated,PersonID")] Device device, string ReturnUrl, int? PersonId)
         {
             if (ModelState.IsValid)
             {
@@ -62,7 +65,15 @@ namespace AccessControlApp.Controllers
                     return Redirect(ReturnUrl);
             }
 
-            ViewBag.PersonID = new SelectList(db.Persons, "ID", "FirstName", device.PersonID);
+            if (PersonId == null)
+            {
+                ViewBag.PersonID = new SelectList(db.Persons, "ID", "FirstNameLastName");
+            }
+            else
+            {
+                ViewBag.PersonID = new SelectList(db.Persons.Where(item => item.ID == PersonId), "ID", "FirstNameLastName");
+            }
+
             return View(device);
         }
 
@@ -141,6 +152,19 @@ namespace AccessControlApp.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+
+        private void PopulateSelectList(dynamic viewBag, int? PersonId)
+        {
+            if (PersonId == null)
+            {
+                ViewBag.PersonID = new SelectList(db.Persons, "ID", "FirstNameLastName");
+            }
+            else
+            {
+                ViewBag.PersonID = new SelectList(db.Persons.Where(item => item.ID == PersonId), "ID", "FirstNameLastName");
+            }
         }
     }
 }

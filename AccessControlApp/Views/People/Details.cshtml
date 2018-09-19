@@ -32,15 +32,15 @@
     <div class="col-md-12" style="margin-bottom:10px;">
         <h3>Personal Info</h3>
         <div class="well">
-            @Html.DisplayNameFor(model => model.FirstName)      <strong>@Model.FirstName</strong><br />
-            @Html.DisplayNameFor(model => model.LastName)       <strong>@Model.LastName</strong><br />
+            @Html.DisplayNameFor(model => model.FirstName)      <strong style="font-size:1.5em">@Model.FirstName</strong><br />
+            @Html.DisplayNameFor(model => model.LastName)       <strong style="font-size:1.5em">@Model.LastName</strong><br />
             @Html.DisplayNameFor(model => model.DateOfBirth)    <strong>@Model.DateOfBirth</strong><br />
             @Html.DisplayNameFor(model => model.EnrollmentDate) <strong>@Model.EnrollmentDate</strong><br />
         </div>
     </div>
 
     <div class="col-md-12" style="margin-bottom:30px;">
-        <h3>Device Info<br /></h3>
+        <h3>Device Info</h3>
 
         @foreach (var device in Model.Devices)
         {
@@ -56,7 +56,7 @@
         }
 
         <div class="col-md-12" style="margin-bottom:10px;">
-            <a href="~/Devices/Create?ReturnUrl=@returnUrl" class="">Add new <i class="fa fa-plus"></i></a>
+            <a href="~/Devices/Create?ReturnUrl=@returnUrl&PersonId=@Model.ID" class="">Add new <i class="fa fa-plus"></i></a>
         </div>
     </div>
 
@@ -67,7 +67,7 @@
         {
             <div class="col-md-5 alert alert-success" style="margin-right:10px">
                 <div class="col-md-12 text-center">
-                    <strong>@poi.Name - @poi.Location</strong>
+                    <h3>@poi.Name - @poi.Location</h3>
                 </div>
                 <div class="col-md-12">
                     <hr />
@@ -83,7 +83,7 @@
                         </div>
                     }
                     <div class="col-md-12" style="margin-bottom:10px;">
-                        <a href="~/Registrations/AddAccess?ReturnUrl=@returnUrl&PersonId=@Model.ID&PoiID=@poi.ID">
+                        <a href="~/Registrations/AddAccessWithNewDevice?ReturnUrl=@returnUrl&PersonId=@Model.ID&PoiID=@poi.ID">
                             Add Access
                             <i class="fa fa-plus"></i>
                         </a>

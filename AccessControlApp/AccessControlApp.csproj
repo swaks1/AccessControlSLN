@@ -260,7 +260,8 @@
     <Content Include="Views\EntryLogs\Details.cshtml" />
     <Content Include="Views\EntryLogs\Edit.cshtml" />
     <Content Include="Views\EntryLogs\Index.cshtml" />
-    <Content Include="Views\Registrations\AddAccess.cshtml" />
+    <Content Include="Views\Registrations\AddAccessWithNewDevice.cshtml" />
+    <Content Include="Views\Registrations\AddAccessPerson.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -71,7 +71,7 @@ namespace AccessControlApp.Controllers
             return View(registration);
         }
 
-        public ActionResult AddAccess(int PersonId, int PoiID)
+        public ActionResult AddAccessWithNewDevice(int PersonId, int PoiID)
         {
             var validPointOfAccesses = db.PointsOfAccess.Where(item => item.ID == PoiID).ToList();
             var poi = validPointOfAccesses.FirstOrDefault();
@@ -87,7 +87,7 @@ namespace AccessControlApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddAccess([Bind(Include = "ID,DateCreated,PointOfAccessID,DeviceID")] Registration registration, string ReturnUrl, int? PersonId, int PoiID)
+        public ActionResult AddAccessWithNewDevice([Bind(Include = "ID,DateCreated,PointOfAccessID,DeviceID")] Registration registration, string ReturnUrl, int? PersonId, int PoiID)
         {
             if (ModelState.IsValid)
             {
@@ -112,7 +112,41 @@ namespace AccessControlApp.Controllers
             return View(registration);
         }
 
-        // GET: Registrations/Edit/5
+        public ActionResult AddAccessPerson(int PoiID)
+        {
+            var validPointOfAccesses = db.PointsOfAccess.Where(item => item.ID == PoiID).ToList();
+            var poi = validPointOfAccesses.FirstOrDefault();
+
+            var registedUsers = poi.RegisteredDevices.Select(reg => reg.Device.PersonID);
+            var validPeople = db.Persons.Where(person => !registedUsers.Contains(person.ID)).ToList();
+            validPeople = validPeople.Where(person => person.Devices.Count > 0).ToList();
+
+            ViewBag.PointOfAccessID = new SelectList(validPointOfAccesses, "ID", "Name");
+            ViewBag.PersonId = new SelectList(validPeople, "ID", "FirstNameLastName");
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddAccessPerson(string ReturnUrl, int? PersonId, int PoiID)
+        {
+            var person = db.Persons.FirstOrDefault(item => item.ID == PersonId);
+            var device = person.Devices.FirstOrDefault();
+
+            var registration = new Registration { PointOfAccessID = PoiID, DeviceID = device.ID, DateCreated = DateTime.Now };
+            {
+                db.Registrations.Add(registration);
+                db.SaveChanges();
+
+                if (string.IsNullOrEmpty(ReturnUrl))
+                    return RedirectToAction("Index");
+                else
+                    return Redirect(ReturnUrl);
+            }
+        }
+
+
         public ActionResult Edit(int? id, string ReturnUrl, int? PersonId)
         {
             if (id == null)
@@ -129,9 +163,6 @@ namespace AccessControlApp.Controllers
             return View(registration);
         }
 
-        // POST: Registrations/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ID,DateCreated,PointOfAccessID,DeviceID")] Registration registration, string ReturnUrl, int? PersonId)
@@ -163,7 +194,6 @@ namespace AccessControlApp.Controllers
             return View(registration);
         }
 
-        // GET: Registrations/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -178,7 +208,6 @@ namespace AccessControlApp.Controllers
             return View(registration);
         }
 
-        // POST: Registrations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id, string ReturnUrl)

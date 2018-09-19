@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AccessControlApp.DataAccessLayer;
+using AccessControlApp.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,23 +10,47 @@ namespace AccessControlApp.Controllers
 {
     public class HomeController : Controller
     {
+        private AccessControlContext db = new AccessControlContext();
+
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult About()
+        public string GetAccess(string PoiId, string Code)
         {
-            ViewBag.Message = "Your application description page.";
+            try
+            {
+                int _PoiId = Int32.Parse(PoiId);
 
-            return View();
-        }
+                var poi = db.PointsOfAccess.FirstOrDefault(item => item.ID == _PoiId);
+                var device = db.Devices.FirstOrDefault(item => item.Code == Code);
+                    
+                var success = poi.RegisteredDevices.FirstOrDefault(reg => reg.Device.Code == Code) != null;
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+                var entryLog = new EntryLog
+                {
+                    DateCreated = DateTime.Now,
+                    DeviceID = device.ID,
+                    PointOfAccessID = poi.ID,
+                    Success = success
+                };
+                db.EntryLogs.Add(entryLog);
+                db.SaveChanges();
 
-            return View();
+                if (success)
+                {
+                    return "TRUE";
+                }                    
+                else
+                {
+                    return "FALSE";
+                }
+            }
+            catch (Exception e)
+            {
+                return "EXCEPTION";
+            }
         }
     }
 }
