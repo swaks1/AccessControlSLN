@@ -1,2 +1,2 @@
 # AccessControlSLN
-Simple web app for iot project
+ASP NET MVC - Simple web app entrance controll system
